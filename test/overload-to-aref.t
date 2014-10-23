@@ -7,7 +7,7 @@ use warnings;
 #
 # https://github.com/ingydotnet/io-all-pm/issues/13 .
 
-use Test::More tests => 2;
+use Test::More tests => 3;
 
 use IO::All;
 
@@ -35,3 +35,9 @@ $s < io($fn2);
 # TEST
 is_deeply ($s, ["IntoArrayRef\n", ], "redirect to an array ref.");
 
+io->file($fn1)->print("One\nTwo\nThree\n");
+
+$s << io($fn1);
+
+# TEST
+is_deeply ($s, ["IntoArrayRef\n", "One\n", "Two\n", "Three\n", ], "redirect to an array ref.");
