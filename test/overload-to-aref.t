@@ -7,7 +7,7 @@ use warnings;
 #
 # https://github.com/ingydotnet/io-all-pm/issues/13 .
 
-use Test::More tests => 3;
+use Test::More tests => 5;
 
 use IO::All;
 
@@ -21,23 +21,43 @@ io->file($fn1)->print("IntoUndef\n");
 my $fn2 = "$dir/file2.txt";
 io->file($fn2)->print("IntoArrayRef\n");
 
-my $s;
+my $fn3 = "$dir/file3.txt";
+io->file($fn3)->print("One\nTwo\nThree\n");
 
-$s < io($fn1);
+{
+    my $s;
 
-# TEST
-is ($s, "IntoUndef\n", "redirect to undef.");
+    $s < io($fn1);
 
-$s = [];
+    # TEST
+    is ($s, "IntoUndef\n", "redirect to undef.");
 
-$s < io($fn2);
+    $s = [];
 
-# TEST
-is_deeply ($s, ["IntoArrayRef\n", ], "redirect to an array ref.");
+    $s < io($fn2);
 
-io->file($fn1)->print("One\nTwo\nThree\n");
+    # TEST
+    is_deeply ($s, ["IntoArrayRef\n", ], "\@ < io - redirect to an array ref.");
 
-$s << io($fn1);
+    $s << io($fn3);
 
-# TEST
-is_deeply ($s, ["IntoArrayRef\n", "One\n", "Two\n", "Three\n", ], "redirect to an array ref.");
+    # TEST
+    is_deeply ($s, ["IntoArrayRef\n", "One\n", "Two\n", "Three\n", ],
+        "\@ << io - redirect to an array ref.");
+}
+
+{
+    my $s;
+
+    $s = [];
+
+    io($fn2)>$s;
+    # TEST
+    is_deeply ($s, ["IntoArrayRef\n", ], "io > \@ - redirect to an array ref.");
+
+    io($fn3) >> $s;
+
+    # TEST
+    is_deeply ($s, ["IntoArrayRef\n", "One\n", "Two\n", "Three\n", ],
+        "io >> \@ - redirect to an array ref.");
+}
