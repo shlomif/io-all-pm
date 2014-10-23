@@ -160,6 +160,7 @@ use overload '${}' => 'overload_string_deref';
 use overload '@{}' => 'overload_array_deref';
 use overload '%{}' => 'overload_hash_deref';
 use overload '&{}' => 'overload_code_deref';
+use overload 'fallback' => 1;
 
 sub overload_bitwise_or {my $self = shift; $self->overload_handler(@_, '|') }
 sub overload_left_bitshift {my $self = shift; $self->overload_handler(@_, '<<') }
@@ -194,6 +195,10 @@ sub overload_table {
         '* > scalar' => 'overload_any_to_scalar',
         '* << scalar' => 'overload_scalar_addto_any',
         '* >> scalar' => 'overload_any_addto_scalar',
+        '* < array' => 'overload_array_to_any',
+        '* > array' => 'overload_any_to_array',
+        '* << array' => 'overload_array_addto_any',
+        '* >> array' => 'overload_any_addto_array',
     )
 };
 
@@ -305,6 +310,27 @@ sub overload_scalar_to_any {
     local $\;
     $_[1]->close if $_[1]->is_file and $_[1]->is_open;
     $_[1]->print($_[2]);
+    $_[1];
+}
+
+sub overload_any_to_array {
+    @{$_[2]} = $_[1]->getlines;
+}
+
+sub overload_any_addto_array {
+    push @{$_[2]}, $_[1]->getlines;
+    $_[2];
+}
+
+sub overload_array_addto_any {
+    $_[1]->append(@{$_[2]});
+    $_[1];
+}
+
+sub overload_array_to_any {
+    local $\;
+    $_[1]->close if $_[1]->is_file and $_[1]->is_open;
+    $_[1]->print(@{$_[2]});
     $_[1];
 }
 
