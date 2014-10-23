@@ -7,7 +7,7 @@ use warnings;
 #
 # https://github.com/ingydotnet/io-all-pm/issues/13 .
 
-use Test::More tests => 6;
+use Test::More tests => 7;
 
 use IO::All;
 
@@ -74,4 +74,17 @@ io->file($fn3)->print("One\nTwo\nThree\n");
 
     # TEST
     is_deeply( [io($fn4)->all], ["One\nTwo\n"], "\@ > io - redirect.");
+}
+
+{
+    my $s = ["One\n", "Two\n"];
+
+    my $fn4 = "$dir/file4.txt";
+
+    io($fn4)->print("Foo\n");
+
+    $s >> io($fn4);
+
+    # TEST
+    is_deeply( [io($fn4)->all], ["Foo\nOne\nTwo\n"], "\@ >> io - redirect.");
 }
