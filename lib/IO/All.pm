@@ -364,6 +364,7 @@ option 'strict';
 proxy 'autoflush';
 proxy 'eof';
 proxy 'fileno';
+proxy 'flush';
 proxy 'stat';
 proxy 'tell';
 proxy 'truncate';
